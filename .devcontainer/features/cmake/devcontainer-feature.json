@@ -1,5 +1,22 @@
 {
   "id": "cmake",
   "name": "CMake",
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "options": {
+    "version": {
+      "description": "CMake version",
+      "type": "string",
+      "default": "latest"
+    },
+    "installNinja": {
+      "description": "Install Ninja build system",
+      "type": "boolean",
+      "default": true
+    },
+    "installBuildEssential": {
+      "description": "Install build-essential",
+      "type": "boolean",
+      "default": true
+    }
+  }
 }
