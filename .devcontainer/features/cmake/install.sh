@@ -21,16 +21,16 @@ chmod +x cmake.sh
 ./cmake.sh --skip-license --prefix=/usr/local
 echo "🟩 Installed CMake v$version"
 
+if [[ $INSTALLBUILDESSENTIAL == true ]]; then
+  echo "🟪 Installing build-essential..."
+  apt-get install -y build-essential
+  echo "🟩 Installed build-essential"
+fi
+
 if [[ $INSTALLNINJA == true ]]; then
   echo "🟪 Installing Ninja..."
   apt-get install -y ninja-build
   echo "🟩 Installed Ninja"
-fi
-
-if [[ $INSTALLBUILDESSENTIAL == true ]]; then
-  echo "🟪 Installing Make..."
-  apt-get install -y build-essential
-  echo "🟩 Installed Make"
 fi
 
 rm -rf /var/lib/apt/lists/*
