@@ -33,6 +33,4 @@ if [[ $INSTALLBUILDESSENTIAL == true ]]; then
   echo "🟩 Installed Make"
 fi
 
-
-
 rm -rf /var/lib/apt/lists/*
