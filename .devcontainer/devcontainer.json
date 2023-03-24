@@ -6,5 +6,5 @@
     "./features/cmake": {},
     "./features/llvm": {}
   },
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y ninja-build && sudo rm -rf /var/lib/apt/lists/* && pipx install conan"
+  "postCreateCommand": "pipx install conan"
 }
