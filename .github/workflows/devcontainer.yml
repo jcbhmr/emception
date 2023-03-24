@@ -1,0 +1,19 @@
+name: Devcontainer
+on:
+  push:
+    branches: [main]
+    paths: [.devcontainer/**, .github/workflows/devcontainer.yml]
+permissions: write-all
+concurrency:
+  group: devcontainer
+  cancel-in-progress: true
+jobs:
+  devcontainer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: devcontainers/ci@v0.3
+        with:
+          imageName: ghcr.io/${{ github.repository }}-devcontainer
+          cacheFrom: ghcr.io/${{ github.repository }}-devcontainer
+          push: always

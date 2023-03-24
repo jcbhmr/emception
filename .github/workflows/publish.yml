@@ -1,0 +1,45 @@
+name: Publish
+on:
+  release:
+    types: [released]
+  workflow_dispatch:
+permissions: write-all
+concurrency: publish
+jobs:
+  publish-npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: devcontainers/ci@v0.3
+        with:
+          runCmd: |
+            npm ci
+            npm publish --access public --foreground-scripts
+          env: |
+            NODE_AUTH_TOKEN=${{ secrets.NPM_TOKEN }}
+  publish-docs:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy-pages.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          cache: npm
+      - run: npm ci
+      - uses: actions/configure-pages@v3
+      - run: npm run docs:prepack
+      - uses: actions/upload-pages-artifact@v1
+        with:
+          path: docs/dist
+      - uses: actions/deploy-pages@v2
+        id: deploy-pages
+  publish-wiki:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: spenserblack/actions-wiki@v0.1.1
+        with:
+          wiki-directory: wiki
+          token: x:${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,49 @@
+name: Test
+on:
+  push:
+    branches: [main]
+    paths:
+      - .devcontainer/**
+      - "*.json"
+      - "*.ts"
+      - src/**
+      - test/**
+      - patches/**
+      - tools/**
+      - packages/*/src/**
+      - packages/*/test/**
+      - packages/*/*.json
+      - packages/*/*.ts
+      - packages/*/*.py
+      - packages/*/*.txt
+      - .github/workflows/test.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - .devcontainer/**
+      - "*.json"
+      - "*.ts"
+      - src/**
+      - test/**
+      - patches/**
+      - tools/**
+      - packages/*/src/**
+      - packages/*/test/**
+      - packages/*/*.json
+      - packages/*/*.ts
+      - packages/*/*.py
+      - packages/*/*.txt
+      - .github/workflows/test.yml
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: devcontainers/ci@v0.3
+        with:
+          runCmd: |
+            npm ci
+            npm test
