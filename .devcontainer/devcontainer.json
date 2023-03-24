@@ -1,0 +1,9 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal",
+  "features": {
+    "ghcr.io/ebaskoro/devcontainer-features/emscripten": {},
+    "ghcr.io/rchaganti/vsc-devcontainer-features/wabt": {},
+    "./features/cmake": {}
+  },
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y ninja-build && sudo rm -rf /var/lib/apt/lists/* && pipx install conan"
+}
