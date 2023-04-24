@@ -1,46 +1,32 @@
-#include "quickjs/quickjs-libc.h"
-#include "quickjs/quickjs.h"
-#include "quickjspp.hpp"
-
-#include <cstdlib>
-#include <unistd.h>
-
-#include <filesystem>
+#include <quickjspp.hpp>
+#include <quickjs/quickjs-libc.h>
+#include <quickjs/quickjs.h>
 #include <string>
+#include <filesystem>
 #include <iostream>
 #include <map>
 #include <vector>
+#include <fstream>
+#include <sstream>
+#include <string_view>
+#include <stdexcept>
 
-namespace fs = std::filesystem;
+namespace node_shim {
 
-template <class T>
-inline constexpr bool always_false_v = false;
-
-class QuickNode {
-  private:
-    std::string m_version;
+class NodeShim {
+  protected:
     qjs::Runtime m_runtime;
     qjs::Context m_context;
-    std::map<fs::path, qjs::Value> m_require_cache;
+    std::map<std::filesystem::path, qjs::Value> m_requireCache;
 
   public:
-    QuickNode(std::string version)
-      : m_version{std::move(version)}
-      , m_runtime{}
-      , m_context{m_runtime}
-      , m_require_cache{}
+    NodeShim(std::vector<std::string> args)
+      : m_version("16.0.0")
+      , m_runtime()
+      , m_context(this->m_runtime)
     {
-        m_context.onUnhandledPromiseRejection = [this](qjs::Value exc){
-            std::cerr << "Unhandled promise rejection: ";
-            dump_exception();
-        };
-        add_global();
-        add_require();
-        add_console();
-        add_process();
-        add_assert();
-        add_fs();
-        add_path();
+        addGlobalErrorHandlers(this->m_context);
+        addNodeJSGlobals(this->m_context);
     }
 
     bool execute_jobs() {
@@ -193,7 +179,7 @@ class QuickNode {
     void add_process() {
         auto process = m_context.newObject();
         m_context.global()["process"] = process;
-        
+
         process.add("cwd", [](){
             return fs::current_path().string();
         });
@@ -276,7 +262,7 @@ class QuickNode {
             } else {
                 throw std::runtime_error("Cannot find module '" + file + "'");
             }
-            
+
             auto canonical = fs::canonical(path);
 
             if (m_require_cache.count(canonical) == 0) {
@@ -319,34 +305,4 @@ class QuickNode {
     }
 };
 
-int main(int argc, char ** argv) {
-    bool success = true;
-    QuickNode qn{"14.15.5"};
-
-    std::vector<std::string> args(argc);
-    for (size_t i = 0; i < args.size(); ++i) {
-        args[i] = argv[i];
-    }
-    qn.global()["process"]["argv"] = args;
-
-    if (argc == 3 && argv[1] == std::string_view{"-e"}) {
-        success = success && qn.eval(argv[2]);
-    } else if (argc >= 2 && argv[1][0] != '-') {
-        success = success && qn.evalFile(argv[1]);
-    } else if (argc == 2 && argv[1] == std::string_view{"--version"}) {
-        std::cout << "v" << qn.version() << "\n";
-        return 0;
-    } else {
-        std::cerr << "Welcome to QuickNode " << (std::string)qn.global()["process"]["version"] << ".\n";
-        std::cerr << "Prompt is not available.\n";
-        std::cerr << "\n";
-        std::cerr << "Usage: quicknode --version\n";
-        std::cerr << "Usage: quicknode -e <code>\n";
-        std::cerr << "Usage: quicknode <script>\n";
-        return 1;
-    }
-
-    success = success && qn.execute_jobs();
-
-    return success ? 0 : 1;
-}
+} // namespace node_shim

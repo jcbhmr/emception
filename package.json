@@ -1,0 +1,19 @@
+{
+  "scripts": {
+    "prepack": "tools/build-vendor.sh && vite build",
+    "prepare": "tools/setup-vendor.sh && (cd packages/node-shim && conan install)",
+    "start": "tools/build-vendor.sh && conc 'start-storybook -p 6006' 'vitest watch'",
+    "pretest": "prettier -w --ignore-path .gitignore .",
+    "test": "tools/build-vendor.sh && tsc --noEmit && vitest run"
+  },
+  "devDependencies": {
+    "prettier": "^2.8.6",
+    "prettier-plugin-jsdoc": "^0.4.2",
+    "prettier-plugin-packagejson": "^2.4.3",
+    "typedoc": "^0.23.28",
+    "typescript": "^5.0.2",
+    "vite": "^4.2.1",
+    "vite-plugin-no-bundle": "^2.0.2",
+    "vitest": "^0.29.7"
+  }
+}

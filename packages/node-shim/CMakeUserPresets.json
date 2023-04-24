@@ -1,0 +1,9 @@
+{
+    "version": 4,
+    "vendor": {
+        "conan": {}
+    },
+    "include": [
+        "/workspaces/emception/packages/node-shim/build/Release/generators/CMakePresets.json"
+    ]
+}
